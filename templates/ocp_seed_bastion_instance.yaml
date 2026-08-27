@@ -111,6 +111,8 @@ Resources:
       UserData: 
         Fn::Base64: !Sub |
           #!/bin/bash
+          set -e
+          trap '/opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource SeedEC2Instance --region ${AWS::Region}' EXIT
           ## Install jq
           yum install -y jq 
           ## Install SSM Agent
@@ -123,8 +125,7 @@ Resources:
           sudo yum install -y git
 
           ## Install ansible
-          wget https://bootstrap.pypa.io/get-pip.py
-          python3 get-pip.py
+          sudo yum install -y python3-pip
           python3 -m pip install ansible junit_xml pymongo xmljson jmespath kubernetes==12.0.1 openshift==0.12.1
           # Install ansible collection
           ansible-galaxy collection install ibm.mas_devops:==${MASDevOpsCollectionVersion}
@@ -146,7 +147,7 @@ Resources:
           sudo mv ~/install-dir/rosa-install/rosa /usr/local/bin/
           
           #Download the ccoctl cli
-          wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/${OCPClusterVersion}/ccoctl-linux-${OCPClusterVersion}.tar.gz -O ~/install-dir/ccoctl-linux-${OCPClusterVersion}.tar.gz
+          wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCPClusterVersion}/ccoctl-linux.tar.gz -O ~/install-dir/ccoctl-linux-${OCPClusterVersion}.tar.gz
           tar xvf ~/install-dir/ccoctl-linux-${OCPClusterVersion}.tar.gz -C ~/install-dir/
           sudo mv ~/install-dir/ccoctl /usr/local/bin/
 
@@ -154,9 +155,7 @@ Resources:
           git clone https://github.com/aws-samples/ibm-mas-on-aws /root/ibm-mas-on-aws
 
           # Install yq
-          pip3 install yq
-          # Signal the status from cfn-init
-          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource SeedEC2Instance --region ${AWS::Region}
+          python3 -m pip install yq
       Tags: 
         - Key: 'Name'
           Value: 'PrivateSeedEc2'
