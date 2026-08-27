@@ -447,7 +447,7 @@ Resources:
 
       Handler: index.lambda_handler
       Role: !GetAtt LambdaIAMRole.Arn
-      Runtime: python3.9
+      Runtime: python3.13
       Timeout: 600
       VpcConfig:
         SecurityGroupIds:
